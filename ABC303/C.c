@@ -1,15 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define BUCKET_SIZE 1000003
+#define BUCKET_SIZE 200000
 
 typedef struct cell {
-  int from;
-  int to;
+  int x;
+  int y;
   struct cell *next;
 } CELL;
 CELL *table[BUCKET_SIZE];
 
-// ハッシュテーブルの初期化
 void init() {
   int i;
   for (i = 0; i < BUCKET_SIZE; i++) {
@@ -17,15 +16,12 @@ void init() {
   }
 }
 
-// ハッシュ値を返す
 int hash(int a, int b) {
-  long ret;
-  ret = ((long)37 * a + b) % BUCKET_SIZE;
+  int ret = (37 * a + b) % BUCKET_SIZE;
   if (ret < 0) ret += BUCKET_SIZE;
-  return (int)ret;
+  return ret;
 }
 
-// 順序対(a,b)があればCELL型へのポインタを、なければNULLを返す
 CELL *find(int a, int b) {
   int h = hash(a, b);
   if (table[h] == NULL) {
@@ -35,7 +31,7 @@ CELL *find(int a, int b) {
   CELL *p = NULL;
   p = table[h];
   while (p != NULL) {
-    if (p->from == a && p->to == b) {
+    if (p->x == a && p->y == b) {
       return p;
     }
     p = p->next;
@@ -43,32 +39,31 @@ CELL *find(int a, int b) {
   return NULL;
 }
 
-// 新しい要素が前に来るように挿入していく
 void insert(int a, int b) {
   if (find(a, b) != NULL) return;
   int h = hash(a, b);
   CELL *new;
   new = (CELL *)malloc(sizeof(CELL));
-  new->from = a;
-  new->to = b;
+  new->x = a;
+  new->y = b;
   new->next = table[h];
   table[h] = new;
 }
 
-// 順序対(a,b)をテーブルから削除する
 void delete(int a, int b) {
   CELL *p, *q;
   int h = hash(a, b);
   if (table[h] == NULL) return;
-  if (table[h]->from == a && table[h]->to == b) {
+  if (table[h]->x == a && table[h]->y == b) {
     p = table[h];
     table[h] = p->next;
     free(p);
+    p = NULL;
     return;
   }
 
   for (q = table[h], p = q->next; p != NULL; q = p, p = p->next) {
-    if (p->from == a && p->to == b) {
+    if (p->x == a && p->y == b) {
       q->next = p->next;
       free(p);
       return;
@@ -78,23 +73,36 @@ void delete(int a, int b) {
 
 int main() {
   init();
-  int N, Q;
-  scanf("%d%d", &N, &Q);
-  for (int i = 0; i < Q; i++) {
-    int t, a, b;
-    scanf("%d%d%d", &t, &a, &b);
-    if (t == 1) {
-      insert(a, b);
+
+  int N, M, H, K;
+  scanf("%d%d%d%d", &N, &M, &H, &K);
+  char s[200003];
+  scanf("%s", s);
+  for (int i = 0; i < M; i++) {
+    int x, y;
+    scanf("%d%d", &x, &y);
+    insert(x, y);
+  }
+
+  int posx, posy;
+  posx = posy = 0;
+  for (int i = 0; i < N; i++) {
+    --H;
+    if (s[i] == 'R') ++posx;
+    if (s[i] == 'L') --posx;
+    if (s[i] == 'U') ++posy;
+    if (s[i] == 'D') --posy;
+
+    if (H < 0) {
+      printf("No");
+      exit(0);
     }
-    if (t == 2) {
-      delete (a, b);
-    }
-    if (t == 3) {
-      if (find(a, b) != NULL && find(b, a) != NULL)
-        puts("Yes");
-      else
-        puts("No");
+
+    if (find(posx, posy) != NULL && H < K) {
+      H = K;
+      delete (posx, posy);
     }
   }
+  printf("Yes");
   return 0;
 }
