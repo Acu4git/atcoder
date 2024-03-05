@@ -20,9 +20,9 @@ int main() {
   }
 
   string ans(N, ' ');
-  for (auto [key, idx_list] : index_map) {
+  for (auto [c, idx_list] : index_map) {
     for (auto i : idx_list) {
-      ans[i - 1] = key;
+      ans[i - 1] = c;
     }
   }
 
