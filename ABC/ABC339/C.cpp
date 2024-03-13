@@ -4,21 +4,16 @@ using namespace std;
 int main() {
   int N;
   cin >> N;
-  long long a[N], sum, start, ans;
+  long long a[N], ans, start;
   for (auto &x : a) cin >> x;
 
-  sum = start = 0;
+  ans = start = 0;
   for (int i = 0; i < N; i++) {
-    sum += a[i];
-    if (sum < 0) {
-      start += abs(sum);
-      sum = 0;
+    ans += a[i];
+    if (ans < 0) {
+      start += abs(ans);
+      ans = 0;
     }
   }
-  if (sum > 0)
-    ans = sum;
-  else
-    ans = 0;
-
   cout << ans << endl;
 }
