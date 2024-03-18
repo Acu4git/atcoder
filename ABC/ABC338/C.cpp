@@ -18,6 +18,7 @@ int main() {
     long long y = INF;
     bool flag = true;  // 料理Aがx人分作れるかどうか
     for (int i = 0; i < N; i++) {
+      // intだと，ここらへん(A[i] * x)でオーバーフローする？
       if (Q[i] - A[i] * x < 0) {
         flag = false;
         break;
